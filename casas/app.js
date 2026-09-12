@@ -12,25 +12,34 @@ document.addEventListener("DOMContentLoaded", () => {
   let progressoSalvo = JSON.parse(localStorage.getItem("enam_progresso")) || {};
   let cadernoErros = JSON.parse(localStorage.getItem("enam_erros")) || [];
 
-  // Injetar painel superior de estatísticas, progresso e menu de revisão
+  // Evita duplicar o painel superior caso o script rode mais de uma vez
   const headerContainer = document.querySelector("header");
-  const barraTopo = document.createElement("div");
-  barraTopo.style.cssText = "display: flex; justify-content: space-between; align-items: center; margin-top: 15px; flex-wrap: wrap; gap: 10px;";
-  barraTopo.innerHTML = `
-    <div id="info-progresso" style="font-size: 0.9rem; color: var(--text-muted);">
-      Progresso: <strong>0/${trilhaENAM.length}</strong> casas concluídas
-    </div>
-    <div style="display: flex; gap: 10px;">
-      <button id="btn-estatisticas" class="casa-btn" style="padding: 6px 12px; font-size: 0.85rem;">📊 Estatísticas</button>
-      <button id="btn-erros" class="casa-btn" style="padding: 6px 12px; font-size: 0.85rem; border-color: var(--accent-red); color: var(--accent-red);">🚨 Caderno de Erros (${cadernoErros.length})</button>
-    </div>
-  `;
-  headerContainer.appendChild(barraTopo);
+  if (!document.getElementById("info-progresso")) {
+    const barraTopo = document.createElement("div");
+    barraTopo.style.cssText = "display: flex; justify-content: space-between; align-items: center; margin-top: 15px; flex-wrap: wrap; gap: 10px;";
+    barraTopo.innerHTML = `
+      <div id="info-progresso" style="font-size: 0.9rem; color: var(--text-muted);">
+        Progresso: <strong>0/${trilhaENAM.length}</strong> casas concluídas
+      </div>
+      <div style="display: flex; gap: 10px;">
+        <button id="btn-estatisticas" class="casa-btn" style="padding: 6px 12px; font-size: 0.85rem;">📊 Estatísticas</button>
+        <button id="btn-erros" class="casa-btn" style="padding: 6px 12px; font-size: 0.85rem; border-color: var(--accent-red); color: var(--accent-red);">🚨 Caderno de Erros (${cadernoErros.length})</button>
+      </div>
+    `;
+    headerContainer.appendChild(barraTopo);
+  }
 
   function atualizarBarraProgresso() {
     const totalConcluidas = Object.values(progressoSalvo).filter(Boolean).length;
-    document.getElementById("info-progresso").innerHTML = `Progresso: <strong>${totalConcluidas}/${trilhaENAM.length}</strong> casas concluídas`;
-    document.getElementById("btn-erros").innerText = `🚨 Caderno de Erros (${cadernoErros.length})`;
+    const infoProgressoEl = document.getElementById("info-progresso");
+    const btnErrosEl = document.getElementById("btn-erros");
+    
+    if (infoProgressoEl) {
+      infoProgressoEl.innerHTML = `Progresso: <strong>${totalConcluidas}/${trilhaENAM.length}</strong> casas concluídas`;
+    }
+    if (btnErrosEl) {
+      btnErrosEl.innerText = `🚨 Caderno de Erros (${cadernoErros.length})`;
+    }
   }
 
   function renderizarCasa(casa) {
@@ -78,7 +87,6 @@ document.addEventListener("DOMContentLoaded", () => {
       ${questoesHtml}
     `;
 
-    // Ativa eventos de clique e teclado nas questões
     ativarLogicaQuestao(casa);
   }
 
@@ -91,7 +99,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const idxCorreto = parseInt(labelEl.getAttribute("data-correta"));
 
       const cardQ = document.getElementById(`questao-${casa.id}-${numQ}`);
-      if (cardQ.classList.contains("respondida")) return;
+      if (!cardQ || cardQ.classList.contains("respondida")) return;
       cardQ.classList.add("respondida");
 
       cardQ.querySelectorAll("input[type='radio']").forEach(i => i.disabled = true);
@@ -114,27 +122,26 @@ document.addEventListener("DOMContentLoaded", () => {
       const identificadorErro = `${casa.id}-${numQ}`;
 
       if (idxSel === idxCorreto) {
-        feedbackDiv.style.backgroundColor = "rgba(35, 134, 54, 0.15)";
-        feedbackDiv.style.border = "1px solid var(--accent-green)";
-        feedbackDiv.innerHTML = `<strong style="color: var(--accent-green);">✔ Resposta Correta!</strong><br><br><em>Comentário:</em> ${questaoObj.comentario}`;
-        
-        // Remove do caderno de erros se acertou posteriormente
+        if (feedbackDiv) {
+          feedbackDiv.style.backgroundColor = "rgba(35, 134, 54, 0.15)";
+          feedbackDiv.style.border = "1px solid var(--accent-green)";
+          feedbackDiv.innerHTML = `<strong style="color: var(--accent-green);">✔ Resposta Correta!</strong><br><br><em>Comentário:</em> ${questaoObj.comentario}`;
+        }
         cadernoErros = cadernoErros.filter(e => e.id !== identificadorErro);
       } else {
-        feedbackDiv.style.backgroundColor = "rgba(218, 54, 51, 0.15)";
-        feedbackDiv.style.border = "1px solid var(--accent-red)";
-        feedbackDiv.innerHTML = `<strong style="color: var(--accent-red);">✖ Resposta Incorreta.</strong><br><br><em>Comentário:</em> ${questaoObj.comentario}`;
-        
-        // Adiciona ao caderno de erros se não existir
+        if (feedbackDiv) {
+          feedbackDiv.style.backgroundColor = "rgba(218, 54, 51, 0.15)";
+          feedbackDiv.style.border = "1px solid var(--accent-red)";
+          feedbackDiv.innerHTML = `<strong style="color: var(--accent-red);">✖ Resposta Incorreta.</strong><br><br><em>Comentário:</em> ${questaoObj.comentario}`;
+        }
         if (!cadernoErros.some(e => e.id === identificadorErro)) {
           cadernoErros.push({ id: identificadorErro, casaId: casa.id, questao: questaoObj });
         }
       }
-      feedbackDiv.style.display = "block";
+      if (feedbackDiv) feedbackDiv.style.display = "block";
 
       localStorage.setItem("enam_erros", JSON.stringify(cadernoErros));
 
-      // Verifica se todas as questões da casa foram respondidas para marcar como concluída
       verificarCasaConcluida(casa);
       atualizarBarraProgresso();
     }
@@ -143,11 +150,9 @@ document.addEventListener("DOMContentLoaded", () => {
       lbl.addEventListener("click", () => processarResposta(lbl));
     });
 
-    // Atalhos de teclado (1, 2, 3, 4) para a primeira questão visível não respondida
     const handleKeypress = (e) => {
       if (["1", "2", "3", "4"].includes(e.key)) {
         const indiceDesejado = parseInt(e.key) - 1;
-        // Pega a primeira questão ainda não respondida na tela
         const primeiraNaoRespondida = document.querySelector(`.questao-card:not(.respondida)`);
         if (primeiraNaoRespondida) {
           const alvoLabel = primeiraNaoRespondida.querySelector(`.opcao-label[data-indice="${indiceDesejado}"]`);
@@ -156,7 +161,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     };
     
-    // Remove listener antigo para evitar duplicação e adiciona o novo
     document.removeEventListener("keydown", window.atalhoTecladoAtual);
     window.atalhoTecladoAtual = handleKeypress;
     document.addEventListener("keydown", handleKeypress);
@@ -170,7 +174,6 @@ document.addEventListener("DOMContentLoaded", () => {
       progressoSalvo[casa.id] = true;
       localStorage.setItem("enam_progresso", JSON.stringify(progressoSalvo));
       
-      // Atualiza visual do botão no tabuleiro
       const btnCasa = document.getElementById(`btn-casa-${casa.id}`);
       if (btnCasa) {
         btnCasa.style.borderColor = "var(--accent-green)";
@@ -179,8 +182,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Renderiza botões do tabuleiro
+  // LIMPA O CONTAINER ANTES DE RENDERIZAR PARA EVITAR DUPLICAÇÃO VISUAL
+  seletorCasas.innerHTML = "";
+  const idsJaCriados = new Set();
+
+  // Renderiza botões do tabuleiro de forma única
   trilhaENAM.forEach((casa, index) => {
+    if (idsJaCriados.has(casa.id)) return;
+    idsJaCriados.add(casa.id);
+
     const btn = document.createElement("button");
     btn.className = "casa-btn";
     btn.id = `btn-casa-${casa.id}`;
@@ -202,7 +212,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     seletorCasas.appendChild(btn);
 
-    if (index === 0) {
+    if (seletorCasas.children.length === 1) {
       btn.classList.add("active");
       renderizarCasa(casa);
     }
@@ -210,50 +220,56 @@ document.addEventListener("DOMContentLoaded", () => {
 
   atualizarBarraProgresso();
 
-  // Ação do Botão Estatísticas
-  document.getElementById("btn-estatisticas").addEventListener("click", () => {
-    const totalCasasConcluidas = Object.values(progressoSalvo).filter(Boolean).length;
-    const percentual = Math.round((totalCasasConcluidas / trilhaENAM.length) * 100) || 0;
-    
-    conteudoCasa.innerHTML = `
-      <h2 style="color: var(--text-highlight); margin-bottom: 15px;">📊 Estatísticas de Desempenho</h2>
-      <p style="margin-bottom: 10px;">Casas Concluídas: <strong>${totalCasasConcluidas} de ${trilhaENAM.length} (${percentual}%)</strong></p>
-      <p style="margin-bottom: 10px;">Questões no Caderno de Erros: <strong>${cadernoErros.length}</strong></p>
-      <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 20px;">Continue firme na sua jornada para o ENAM 2026! A constância é o segredo da aprovação.</p>
-    `;
-  });
+  // Ação do Botão Estatísticas (atribuída de forma segura caso o botão já exista)
+  const btnEstatisticas = document.getElementById("btn-estatisticas");
+  if (btnEstatisticas) {
+    btnEstatisticas.addEventListener("click", () => {
+      const totalCasasConcluidas = Object.values(progressoSalvo).filter(Boolean).length;
+      const percentual = Math.round((totalCasasConcluidas / trilhaENAM.length) * 100) || 0;
+      
+      conteudoCasa.innerHTML = `
+        <h2 style="color: var(--text-highlight); margin-bottom: 15px;">📊 Estatísticas de Desempenho</h2>
+        <p style="margin-bottom: 10px;">Casas Concluídas: <strong>${totalCasasConcluidas} de ${trilhaENAM.length} (${percentual}%)</strong></p>
+        <p style="margin-bottom: 10px;">Questões no Caderno de Erros: <strong>${cadernoErros.length}</strong></p>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 20px;">Continue firme na sua jornada para o ENAM 2026! A constância é o segredo da aprovação.</p>
+      `;
+    });
+  }
 
   // Ação do Botão Caderno de Erros
-  document.getElementById("btn-erros").addEventListener("click", () => {
-    if (cadernoErros.length === 0) {
+  const btnErros = document.getElementById("btn-erros");
+  if (btnErros) {
+    btnErros.addEventListener("click", () => {
+      if (cadernoErros.length === 0) {
+        conteudoCasa.innerHTML = `
+          <h2 style="color: var(--text-highlight); margin-bottom: 15px;">🚨 Caderno de Erros</h2>
+          <p>Parabéns! Você não tem questões pendentes no momento ou ainda não errou nenhuma questão.</p>
+        `;
+        return;
+      }
+
+      const errosHtml = cadernoErros.map(item => `
+        <div class="questao-card" style="margin-bottom: 20px; border-color: var(--accent-red);">
+          <span style="font-size: 0.8rem; color: var(--accent-red); font-weight: bold;">Casa ${item.casaId} - Questão ${item.questao.numero}</span>
+          <p class="enunciado" style="margin-top: 8px;"><strong>${item.questao.enunciado}</strong></p>
+          <div class="alternativas">
+            ${item.questao.opcoes.map((opcao, idx) => `
+              <div style="padding: 8px; margin: 4px 0; background: var(--bg-secondary); border-radius: 4px; font-size: 0.85rem; ${idx === item.questao.respostaCorreta ? 'border: 1px solid var(--accent-green); color: var(--accent-green);' : ''}">
+                ${opcao} ${idx === item.questao.respostaCorreta ? '<strong>(Gabarito)</strong>' : ''}
+              </div>
+            `).join("")}
+          </div>
+          <div style="margin-top: 10px; font-size: 0.85rem; color: var(--text-muted);">
+            <em>Comentário:</em> ${item.questao.comentario}
+          </div>
+        </div>
+      `).join("");
+
       conteudoCasa.innerHTML = `
-        <h2 style="color: var(--text-highlight); margin-bottom: 15px;">🚨 Caderno de Erros</h2>
-        <p>Parabéns! Você não tem questões pendentes no momento ou ainda não errou nenhuma questão.</p>
+        <h2 style="color: var(--text-highlight); margin-bottom: 15px;">🚨 Caderno de Erros (${cadernoErros.length})</h2>
+        <p style="margin-bottom: 15px; color: var(--text-muted); font-size: 0.9rem;">Revise com atenção as questões que você errou anteriormente:</p>
+        ${errosHtml}
       `;
-      return;
-    }
-
-    const errosHtml = cadernoErros.map(item => `
-      <div class="questao-card" style="margin-bottom: 20px; border-color: var(--accent-red);">
-        <span style="font-size: 0.8rem; color: var(--accent-red); font-weight: bold;">Casa ${item.casaId} - Questão ${item.questao.numero}</span>
-        <p class="enunciado" style="margin-top: 8px;"><strong>${item.questao.enunciado}</strong></p>
-        <div class="alternativas">
-          ${item.questao.opcoes.map((opcao, idx) => `
-            <div style="padding: 8px; margin: 4px 0; background: var(--bg-secondary); border-radius: 4px; font-size: 0.85rem; ${idx === item.questao.respostaCorreta ? 'border: 1px solid var(--accent-green); color: var(--accent-green);' : ''}">
-              ${opcao} ${idx === item.questao.respostaCorreta ? '<strong>(Gabarito)</strong>' : ''}
-            </div>
-          `).join("")}
-        </div>
-        <div style="margin-top: 10px; font-size: 0.85rem; color: var(--text-muted);">
-          <em>Comentário:</em> ${item.questao.comentario}
-        </div>
-      </div>
-    `).join("");
-
-    conteudoCasa.innerHTML = `
-      <h2 style="color: var(--text-highlight); margin-bottom: 15px;">🚨 Caderno de Erros (${cadernoErros.length})</h2>
-      <p style="margin-bottom: 15px; color: var(--text-muted); font-size: 0.9rem;">Revise com atenção as questões que você errou anteriormente:</p>
-      ${errosHtml}
-    `;
-  });
+    });
+  }
 });
