@@ -49,40 +49,39 @@ document.addEventListener("DOMContentLoaded", () => {
       `<a href="${item.url}" target="_blank" class="link-pill">⚖️ ${item.rotulo}</a>`
     ).join("");
 
-    // GERADOR DE QUESTÕES REAIS / PADRÃO ENAM-FGV MAIS DIFÍCEIS
-    // Caso o array casa.questoes não tenha questões avançadas injetadas, criamos um simulado de alta exigência contextualizado
+    // GERADOR DE QUESTÕES DE ALTA COMPLEXIDADE (PADRÃO MAGISTRATURA / FGV)
     const questoesPadrao = casa.questoes && casa.questoes.length > 0 ? casa.questoes : [
       {
         numero: 1,
-        enunciado: `Em sede de controle concentrado de constitucionalidade, o Plenário do STF modulou os efeitos de decisão declaratória de inconstitucionalidade de lei tributária restitiva de direitos, conferindo-lhe eficácia <em>ex nunc</em>. Posteriormente, fundamentando-se na referida decisão da Corte Suprema, um contribuinte ajuizou ação rescisória visando desconstituir julgado transitado em julgado que lhe fora desfavorável antes da modulação. À luz da jurisprudência vinculante e da sistemática constitucional, assinale a alternativa correta:`,
+        enunciado: `Em sede de controle concentrado de constitucionalidade, o Plenário do STF modulou os efeitos de decisão declaratória de inconstitucionalidade com eficácia <em>ex nunc</em>. Posteriormente, um contribuinte ajuizou ação rescisória para desconstituir julgado anterior desfavorável. À luz da jurisprudência vinculante, assinale a correta:`,
         opcoes: [
-          "A ação rescisória é inteiramente incabível, visto que a modulação de efeitos opera preclusão máxima intransponível sobre quaisquer relações jurídicas anteriores.",
-          "A ação rescisória é cabível, desde que respeitados os limites estritos da modulação temporal fixada pelo Supremo Tribunal Federal, que baliza os efeitos retroativos ou prospectivos do julgado.",
-          "A decisão do STF em controle concentrado possui eficácia erga omnes automática, derrogando de plano e sem necessidade de ação autônoma todas as sentenças passadas, independentemente de trânsito em julgado.",
-          "O ajuizamento de ação rescisória é vedado em matéria tributária quando houver modulação restritiva, prevalecendo a segurança jurídica absoluta da coisa julgada material em detrimento da isonomia.",
-          "A via adequada para o pleito seria o mandado de segurança coletivo repressivo, sendo imprópria a ação rescisória por ausência de previsão legal expressa no Código de Processo Civil."
+          "A ação rescisória é inteiramente incabível por preclusão máxima.",
+          "A ação rescisória é cabível, desde que respeitados estritamente os limites da modulação temporal fixada pelo STF.",
+          "A decisão do STF anula automaticamente todas as sentenças passadas sem necessidade de ação autônoma.",
+          "O ajuizamento de ação rescisória é vedado em matéria tributária por segurança jurídica absoluta.",
+          "A via adequada seria exclusivamente o mandado de segurança coletivo."
         ],
         respostaCorreta: 1,
-        comentario: "Conforme a jurisprudência do STF, a modulação de efeitos no controle concentrado delimita o alcance temporal da declaração de inconstitucionalidade, balizando o cabimento de ações rescisórias e permitindo-as estritamente dentro dos parâmetros prospectivos ou retroativos definidos pela Corte no acórdão paradigma."
+        comentario: "STF: A modulação temporal baliza o cabimento de ações rescisórias, permitindo-as estritamente dentro dos parâmetros definidos no acórdão paradigma."
       },
       {
         numero: 2,
-        enunciado: `Durante investigação criminal complexa conduzida pelo Ministério Público, autorizou-se judicialmente interceptação telefônica devidamente fundamentada. No curso das diligências, os órgãos de persecução penal descobriram fortuitamente ('encontro fortuito de provas') a prática de infração penal diversa, conexa, punida com reclusão, mas que não era o objeto original da investigação. Diante desse cenário e do entendimento consolidado do STJ e STF, assinale a afirmativa correta:`,
+        enunciado: `Durante interceptação telefônica legal, os órgãos de persecução descobriram fortuitamente ('serendipidade') a prática de crime diverso, conexo, punido com reclusão, mas que não era o objeto original. Assinale a afirmativa correta:`,
         opcoes: [
-          "A prova colhida fortuitamente é considerada ilícita por desvio de finalidade, devendo ser imediatamente entranhada em autos apartados e destruída, vedado o seu aproveitamento.",
-          "O aproveitamento do encontro fortuito de provas é plenamente válido e lícito, desde que o delito descoberto seja punido com reclusão e guarde conexão com os fatos investigados ou evidencie organização criminosa, dispensando nova autorização judicial.",
-          "A utilização da prova fortuita depende impreterivelmente de imediata oitiva da defesa técnica e de concordância expressa do juiz natural da causa originária por meio de incidente de cizânia processual.",
-          "O encontro fortuito de provas só possui validade jurídica se o crime revelado for de menor potencial ofensivo, visando proteger o princípio da proporcionalidade estrita.",
-          "A prova é natimorta, aplicando-se a teoria dos frutos da árvore envenenada, visto que a interceptação telefônica é medida cautelar de interpretação restritiva insuscetível de ampliações teleológicas."
+          "A prova fortuita é ilícita por desvio de finalidade e deve ser destruída.",
+          "O aproveitamento do encontro fortuito é válido, desde que o crime descoberto seja punido com reclusão e haja conexão ou organização criminosa, dispensando nova autorização.",
+          "A utilização depende de imediata oitiva da defesa e concordância do juiz da causa.",
+          "O encontro fortuito só vale se o crime revelado for de menor potencial ofensivo.",
+          "A prova é nula por aplicação da teoria dos frutos da árvore envenenada."
         ],
         respostaCorreta: 1,
-        comentario: "O STF e o STJ firmaram entendimento de que o encontro fortuito de provas (serendipidade) em interceptações telefônicas legais é válido, desde que o crime fortuito seja punido com pena de reclusão e haja conexão com o fato investigado ou revele organização criminosa, sem exigência de prévia autorização específica para aquele delito incidental."
+        comentario: "STF/STJ: O encontro fortuito em interceptação legal é lícito se o crime isolado admitir reclusão e houver conexão com os fatos apurados."
       }
     ];
 
     const questoesHtml = questoesPadrao.map(q => `
       <div class="questao-card" id="questao-${casa.id}-${q.numero}">
-        <p class="enunciado"><strong>Questão ${q.numero} (Padrão ENAM/FGV):</strong> ${q.enunciado}</p>
+        <p class="enunciado"><strong>Questão ${q.numero} (ENAM/FGV):</strong> ${q.enunciado}</p>
         <div class="alternativas">
           ${q.opcoes.map((opcao, index) => `
             <label class="opcao-label" data-casa="${casa.id}" data-questao="${q.numero}" data-indice="${index}" data-correta="${q.respostaCorreta}">
@@ -98,21 +97,30 @@ document.addEventListener("DOMContentLoaded", () => {
       <span style="font-size: 0.85rem; color: var(--accent-gold); font-weight: bold;">DISCIPLINA: ${casa.disciplina} | PRIORIDADE: ${casa.prioridade}</span>
       <h2 style="color: var(--text-highlight); margin: 10px 0 15px 0;">Casa ${casa.id}: ${casa.titulo}</h2>
       
-      <div class="secao-titulo">1. Lei Seca de Destaque</div>
+      <div class="secao-titulo">1. Lei Seca Direta</div>
       <div class="link-box">${leiSecaHtml}</div>
 
-      <div class="secao-titulo">2. Jurisprudência Vinculada (STF / STJ)</div>
+      <div class="secao-titulo">2. Jurisprudência Relacionável (Resumo Direto)</div>
+      <div class="link-box" style="background: var(--bg-secondary); padding: 12px; border-radius: 6px; font-size: 0.9rem; line-height: 1.5; margin-bottom: 15px;">
+        <ul style="margin: 0; padding-left: 20px;">
+          <li><strong>Tese Principal:</strong> A FGV exige a literalidade combinada com a última orientação dos tribunais superiores (STF/STJ).</li>
+          <li><strong>Ponto-Chave:</strong> Atente-se sempre aos limites de modulação de efeitos, competências absolutas e exceções expressas na lei.</li>
+        </ul>
+      </div>
       <div class="link-box">${jurisprudenciaHtml}</div>
 
-      <div class="secao-titulo">3. Resumo Estratégico</div>
-      <p style="margin-bottom: 15px; font-size: 0.95rem; text-align: justify;">${casa.resumo}</p>
+      <div class="secao-titulo">3. 💡 Macete de Memorização (Mnemônico)</div>
+      <div style="background: rgba(210, 153, 34, 0.15); border: 1px solid var(--accent-gold); padding: 12px; border-radius: 6px; margin-bottom: 15px; font-size: 0.9rem;">
+        <strong>Regra de Ouro:</strong> <em>"O acessório segue o principal, mas a Súmula Vinculante manda no jogo."</em><br>
+        <span style="font-size: 0.85rem; color: var(--text-muted);">Memorize: Sempre que houver conflito entre regra geral e precedente vinculante, prevalece a tese defensiva do tribunal superior.</span>
+      </div>
 
       <div class="secao-titulo">4. Radar de Pegadinhas (FGV)</div>
       <div class="pegadinha-card">
-        <strong>⚠️ Atenção:</strong> ${casa.pegadinhaFGV}
+        <strong>⚠️ Pegadinha clássica:</strong> ${casa.pegadinhaFGV}
       </div>
 
-      <div class="secao-titulo">5. Simulado de Alta Complexidade (Padrão Magistratura) <span style="font-size: 0.75rem; color: var(--text-muted);">(Atalhos: use as teclas 1, 2, 3, 4 ou 5)</span></div>
+      <div class="secao-titulo">5. Simulado de Alta Complexidade <span style="font-size: 0.75rem; color: var(--text-muted);">(Atalhos: Teclas 1 a 5)</span></div>
       ${questoesHtml}
     `;
 
@@ -154,14 +162,14 @@ document.addEventListener("DOMContentLoaded", () => {
         if (feedbackDiv) {
           feedbackDiv.style.backgroundColor = "rgba(35, 134, 54, 0.15)";
           feedbackDiv.style.border = "1px solid var(--accent-green)";
-          feedbackDiv.innerHTML = `<strong style="color: var(--accent-green);">✔ Resposta Correta!</strong><br><br><em>Comentário Estratégico:</em> ${questaoObj.comentario}`;
+          feedbackDiv.innerHTML = `<strong style="color: var(--accent-green);">✔ Correto!</strong><br><em>Justificativa:</em> ${questaoObj.comentario}`;
         }
         cadernoErros = cadernoErros.filter(e => e.id !== identificadorErro);
       } else {
         if (feedbackDiv) {
           feedbackDiv.style.backgroundColor = "rgba(218, 54, 51, 0.15)";
           feedbackDiv.style.border = "1px solid var(--accent-red)";
-          feedbackDiv.innerHTML = `<strong style="color: var(--accent-red);">✖ Resposta Incorreta.</strong><br><br><em>Comentário Estratégico:</em> ${questaoObj.comentario}`;
+          feedbackDiv.innerHTML = `<strong style="color: var(--accent-red);">✖ Incorreto.</strong><br><em>Justificativa:</em> ${questaoObj.comentario}`;
         }
         if (!cadernoErros.some(e => e.id === identificadorErro)) {
           cadernoErros.push({ id: identificadorErro, casaId: casa.id, questao: questaoObj });
@@ -250,14 +258,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnEstatisticas = document.getElementById("btn-estatisticas");
   if (btnEstatisticas) {
     btnEstatisticas.addEventListener("click", () => {
-      const totalCasasConcluidas = Object.values(progressoSalvo).filter(Boolean).length;
-      const percentual = Math.round((totalCasasConcluidas / trilhaENAM.length) * 100) || 0;
+      const totalConcluidas = Object.values(progressoSalvo).filter(Boolean).length;
+      const percentual = Math.round((totalConcluidas / trilhaENAM.length) * 100) || 0;
       
       conteudoCasa.innerHTML = `
         <h2 style="color: var(--text-highlight); margin-bottom: 15px;">📊 Estatísticas de Desempenho</h2>
-        <p style="margin-bottom: 10px;">Casas Concluídas: <strong>${totalCasasConcluidas} de ${trilhaENAM.length} (${percentual}%)</strong></p>
-        <p style="margin-bottom: 10px;">Questões Desafiadoras no Caderno de Erros: <strong>${cadernoErros.length}</strong></p>
-        <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 20px;">Você está se preparando no padrão de exigência da Magistratura! Foco total nas teses do STF e STJ.</p>
+        <p style="margin-bottom: 10px;">Casas Concluídas: <strong>${totalConcluidas} de ${trilhaENAM.length} (${percentual}%)</strong></p>
+        <p style="margin-bottom: 10px;">Itens no Caderno de Erros: <strong>${cadernoErros.length}</strong></p>
       `;
     });
   }
@@ -268,7 +275,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (cadernoErros.length === 0) {
         conteudoCasa.innerHTML = `
           <h2 style="color: var(--text-highlight); margin-bottom: 15px;">🚨 Caderno de Erros</h2>
-          <p>Excelente! Nenhuma questão pendente de revisão complexa no momento.</p>
+          <p>Tudo limpo! Nenhuma pendência de revisão.</p>
         `;
         return;
       }
@@ -279,20 +286,19 @@ document.addEventListener("DOMContentLoaded", () => {
           <p class="enunciado" style="margin-top: 8px;"><strong>${item.questao.enunciado}</strong></p>
           <div class="alternativas">
             ${item.questao.opcoes.map((opcao, idx) => `
-              <div style="padding: 8px; margin: 4px 0; background: var(--bg-secondary); border-radius: 4px; font-size: 0.85rem; ${idx === item.questao.respostaCorreta ? 'border: 1px solid var(--accent-green); color: var(--accent-green);' : ''}">
-                [${String.fromCharCode(65 + idx)}] ${opcao} ${idx === item.questao.respostaCorreta ? '<strong>(Gabarito Comentado)</strong>' : ''}
+              <div style="padding: 6px; margin: 3px 0; background: var(--bg-secondary); border-radius: 4px; font-size: 0.85rem; ${idx === item.questao.respostaCorreta ? 'border: 1px solid var(--accent-green); color: var(--accent-green);' : ''}">
+                [${String.fromCharCode(65 + idx)}] ${opcao} ${idx === item.questao.respostaCorreta ? '<strong>(Gabarito)</strong>' : ''}
               </div>
             `).join("")}
           </div>
-          <div style="margin-top: 10px; font-size: 0.85rem; color: var(--text-muted);">
-            <em>Comentário Estratégico:</em> ${item.questao.comentario}
+          <div style="margin-top: 8px; font-size: 0.85rem; color: var(--text-muted);">
+            <em>Justificativa:</em> ${item.questao.comentario}
           </div>
         </div>
       `).join("");
 
       conteudoCasa.innerHTML = `
         <h2 style="color: var(--text-highlight); margin-bottom: 15px;">🚨 Caderno de Erros (${cadernoErros.length})</h2>
-        <p style="margin-bottom: 15px; color: var(--text-muted); font-size: 0.9rem;">Revisão direcionada dos pontos críticos de alta dificuldade:</p>
         ${errosHtml}
       `;
     });
