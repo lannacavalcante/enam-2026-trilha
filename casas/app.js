@@ -1,23 +1,23 @@
-// Exemplo de script principal (app.js ou dentro de <script> no index.html)
+// casas/app.js
 document.addEventListener("DOMContentLoaded", () => {
-  // Lista de casas disponíveis (adicione novas casas aqui conforme for criando)
-  const todasAsCasas = [casa1, casa2]; 
+  // A variável 'trilhaENAM' vem direto do arquivo dados.js
+  if (typeof trilhaENAM === "undefined" || trilhaENAM.length === 0) {
+    console.error("Nenhuma casa encontrada na trilha.");
+    return;
+  }
 
   const seletorCasas = document.getElementById("seletor-casas");
   const conteudoCasa = document.getElementById("conteudo-casa");
 
   function renderizarCasa(casa) {
-    // Monta os links de Lei Seca
     const leiSecaHtml = casa.leiSeca.map(item => 
       `<a href="${item.url}" target="_blank" class="link-pill">📖 ${item.rotulo}</a>`
     ).join("");
 
-    // Monta os links de Jurisprudência
     const jurisprudenciaHtml = casa.jurisprudencia.map(item => 
       `<a href="${item.url}" target="_blank" class="link-pill">⚖️ ${item.rotulo}</a>`
     ).join("");
 
-    // Monta as questões
     const questoesHtml = casa.questoes.map(q => `
       <div class="questao-card">
         <p class="enunciado"><strong>Questão ${q.numero}:</strong> ${q.enunciado}</p>
@@ -34,7 +34,6 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
     `).join("");
 
-    // Injeta o conteúdo no painel principal
     conteudoCasa.innerHTML = `
       <span style="font-size: 0.85rem; color: var(--accent-gold); font-weight: bold;">DISCIPLINA: ${casa.disciplina} | PRIORIDADE: ${casa.prioridade}</span>
       <h2 style="color: var(--text-highlight); margin: 10px 0 15px 0;">Casa ${casa.id}: ${casa.titulo}</h2>
@@ -58,14 +57,13 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
   }
 
-  // Cria os botões de seleção de cada casa dinamicamente
-  todasAsCasas.forEach((casa, index) => {
+  // Gera os botões do tabuleiro de forma dinâmica
+  trilhaENAM.forEach((casa, index) => {
     const btn = document.createElement("button");
     btn.className = "casa-btn";
     btn.innerText = `Casa ${casa.id}`;
     
     btn.addEventListener("click", () => {
-      // Remove a classe active de todos e adiciona no clicado
       document.querySelectorAll(".casa-btn").forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
       renderizarCasa(casa);
@@ -73,7 +71,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     seletorCasas.appendChild(btn);
 
-    // Carrega a primeira casa por padrão ao abrir a página
+    // Carrega a primeira casa por padrão ao abrir o site
     if (index === 0) {
       btn.classList.add("active");
       renderizarCasa(casa);
