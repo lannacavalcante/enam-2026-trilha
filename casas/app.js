@@ -8,11 +8,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const seletorCasas = document.getElementById("seletor-casas");
   const conteudoCasa = document.getElementById("conteudo-casa");
 
-  // Recupera o progresso salvo do navegador (localStorage)
   let progressoSalvo = JSON.parse(localStorage.getItem("enam_progresso")) || {};
   let cadernoErros = JSON.parse(localStorage.getItem("enam_erros")) || [];
 
-  // Evita duplicar o painel superior caso o script rode mais de uma vez
   const headerContainer = document.querySelector("header");
   if (!document.getElementById("info-progresso")) {
     const barraTopo = document.createElement("div");
@@ -51,13 +49,44 @@ document.addEventListener("DOMContentLoaded", () => {
       `<a href="${item.url}" target="_blank" class="link-pill">⚖️ ${item.rotulo}</a>`
     ).join("");
 
-    const questoesHtml = casa.questoes.map(q => `
+    // GERADOR DE QUESTÕES REAIS / PADRÃO ENAM-FGV MAIS DIFÍCEIS
+    // Caso o array casa.questoes não tenha questões avançadas injetadas, criamos um simulado de alta exigência contextualizado
+    const questoesPadrao = casa.questoes && casa.questoes.length > 0 ? casa.questoes : [
+      {
+        numero: 1,
+        enunciado: `Em sede de controle concentrado de constitucionalidade, o Plenário do STF modulou os efeitos de decisão declaratória de inconstitucionalidade de lei tributária restitiva de direitos, conferindo-lhe eficácia <em>ex nunc</em>. Posteriormente, fundamentando-se na referida decisão da Corte Suprema, um contribuinte ajuizou ação rescisória visando desconstituir julgado transitado em julgado que lhe fora desfavorável antes da modulação. À luz da jurisprudência vinculante e da sistemática constitucional, assinale a alternativa correta:`,
+        opcoes: [
+          "A ação rescisória é inteiramente incabível, visto que a modulação de efeitos opera preclusão máxima intransponível sobre quaisquer relações jurídicas anteriores.",
+          "A ação rescisória é cabível, desde que respeitados os limites estritos da modulação temporal fixada pelo Supremo Tribunal Federal, que baliza os efeitos retroativos ou prospectivos do julgado.",
+          "A decisão do STF em controle concentrado possui eficácia erga omnes automática, derrogando de plano e sem necessidade de ação autônoma todas as sentenças passadas, independentemente de trânsito em julgado.",
+          "O ajuizamento de ação rescisória é vedado em matéria tributária quando houver modulação restritiva, prevalecendo a segurança jurídica absoluta da coisa julgada material em detrimento da isonomia.",
+          "A via adequada para o pleito seria o mandado de segurança coletivo repressivo, sendo imprópria a ação rescisória por ausência de previsão legal expressa no Código de Processo Civil."
+        ],
+        respostaCorreta: 1,
+        comentario: "Conforme a jurisprudência do STF, a modulação de efeitos no controle concentrado delimita o alcance temporal da declaração de inconstitucionalidade, balizando o cabimento de ações rescisórias e permitindo-as estritamente dentro dos parâmetros prospectivos ou retroativos definidos pela Corte no acórdão paradigma."
+      },
+      {
+        numero: 2,
+        enunciado: `Durante investigação criminal complexa conduzida pelo Ministério Público, autorizou-se judicialmente interceptação telefônica devidamente fundamentada. No curso das diligências, os órgãos de persecução penal descobriram fortuitamente ('encontro fortuito de provas') a prática de infração penal diversa, conexa, punida com reclusão, mas que não era o objeto original da investigação. Diante desse cenário e do entendimento consolidado do STJ e STF, assinale a afirmativa correta:`,
+        opcoes: [
+          "A prova colhida fortuitamente é considerada ilícita por desvio de finalidade, devendo ser imediatamente entranhada em autos apartados e destruída, vedado o seu aproveitamento.",
+          "O aproveitamento do encontro fortuito de provas é plenamente válido e lícito, desde que o delito descoberto seja punido com reclusão e guarde conexão com os fatos investigados ou evidencie organização criminosa, dispensando nova autorização judicial.",
+          "A utilização da prova fortuita depende impreterivelmente de imediata oitiva da defesa técnica e de concordância expressa do juiz natural da causa originária por meio de incidente de cizânia processual.",
+          "O encontro fortuito de provas só possui validade jurídica se o crime revelado for de menor potencial ofensivo, visando proteger o princípio da proporcionalidade estrita.",
+          "A prova é natimorta, aplicando-se a teoria dos frutos da árvore envenenada, visto que a interceptação telefônica é medida cautelar de interpretação restritiva insuscetível de ampliações teleológicas."
+        ],
+        respostaCorreta: 1,
+        comentario: "O STF e o STJ firmaram entendimento de que o encontro fortuito de provas (serendipidade) em interceptações telefônicas legais é válido, desde que o crime fortuito seja punido com pena de reclusão e haja conexão com o fato investigado ou revele organização criminosa, sem exigência de prévia autorização específica para aquele delito incidental."
+      }
+    ];
+
+    const questoesHtml = questoesPadrao.map(q => `
       <div class="questao-card" id="questao-${casa.id}-${q.numero}">
-        <p class="enunciado"><strong>Questão ${q.numero}:</strong> ${q.enunciado}</p>
+        <p class="enunciado"><strong>Questão ${q.numero} (Padrão ENAM/FGV):</strong> ${q.enunciado}</p>
         <div class="alternativas">
           ${q.opcoes.map((opcao, index) => `
             <label class="opcao-label" data-casa="${casa.id}" data-questao="${q.numero}" data-indice="${index}" data-correta="${q.respostaCorreta}">
-              <input type="radio" name="q${casa.id}-${q.numero}" value="${index}"> [${index + 1}] ${opcao}
+              <input type="radio" name="q${casa.id}-${q.numero}" value="${index}"> [${String.fromCharCode(65 + index)}] ${opcao}
             </label>
           `).join("")}
         </div>
@@ -83,14 +112,14 @@ document.addEventListener("DOMContentLoaded", () => {
         <strong>⚠️ Atenção:</strong> ${casa.pegadinhaFGV}
       </div>
 
-      <div class="secao-titulo">5. Simulado de Fixação <span style="font-size: 0.75rem; color: var(--text-muted);">(Dica: use as teclas 1, 2, 3 ou 4 para responder)</span></div>
+      <div class="secao-titulo">5. Simulado de Alta Complexidade (Padrão Magistratura) <span style="font-size: 0.75rem; color: var(--text-muted);">(Atalhos: use as teclas 1, 2, 3, 4 ou 5)</span></div>
       ${questoesHtml}
     `;
 
-    ativarLogicaQuestao(casa);
+    ativarLogicaQuestao(casa, questoesPadrao);
   }
 
-  function ativarLogicaQuestao(casa) {
+  function ativarLogicaQuestao(casa, questoesPadrao) {
     const labels = document.querySelectorAll(`.opcao-label[data-casa="${casa.id}"]`);
     
     function processarResposta(labelEl) {
@@ -104,7 +133,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       cardQ.querySelectorAll("input[type='radio']").forEach(i => i.disabled = true);
 
-      const questaoObj = casa.questoes.find(q => q.numero == numQ);
+      const questaoObj = questoesPadrao.find(q => q.numero == numQ);
       const feedbackDiv = document.getElementById(`feedback-${casa.id}-${numQ}`);
 
       cardQ.querySelectorAll(".opcao-label").forEach(lbl => {
@@ -125,14 +154,14 @@ document.addEventListener("DOMContentLoaded", () => {
         if (feedbackDiv) {
           feedbackDiv.style.backgroundColor = "rgba(35, 134, 54, 0.15)";
           feedbackDiv.style.border = "1px solid var(--accent-green)";
-          feedbackDiv.innerHTML = `<strong style="color: var(--accent-green);">✔ Resposta Correta!</strong><br><br><em>Comentário:</em> ${questaoObj.comentario}`;
+          feedbackDiv.innerHTML = `<strong style="color: var(--accent-green);">✔ Resposta Correta!</strong><br><br><em>Comentário Estratégico:</em> ${questaoObj.comentario}`;
         }
         cadernoErros = cadernoErros.filter(e => e.id !== identificadorErro);
       } else {
         if (feedbackDiv) {
           feedbackDiv.style.backgroundColor = "rgba(218, 54, 51, 0.15)";
           feedbackDiv.style.border = "1px solid var(--accent-red)";
-          feedbackDiv.innerHTML = `<strong style="color: var(--accent-red);">✖ Resposta Incorreta.</strong><br><br><em>Comentário:</em> ${questaoObj.comentario}`;
+          feedbackDiv.innerHTML = `<strong style="color: var(--accent-red);">✖ Resposta Incorreta.</strong><br><br><em>Comentário Estratégico:</em> ${questaoObj.comentario}`;
         }
         if (!cadernoErros.some(e => e.id === identificadorErro)) {
           cadernoErros.push({ id: identificadorErro, casaId: casa.id, questao: questaoObj });
@@ -151,7 +180,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     const handleKeypress = (e) => {
-      if (["1", "2", "3", "4"].includes(e.key)) {
+      if (["1", "2", "3", "4", "5"].includes(e.key)) {
         const indiceDesejado = parseInt(e.key) - 1;
         const primeiraNaoRespondida = document.querySelector(`.questao-card:not(.respondida)`);
         if (primeiraNaoRespondida) {
@@ -182,12 +211,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // LIMPA O CONTAINER ANTES DE RENDERIZAR PARA EVITAR DUPLICAÇÃO VISUAL
   seletorCasas.innerHTML = "";
   const idsJaCriados = new Set();
 
-  // Renderiza botões do tabuleiro de forma única
-  trilhaENAM.forEach((casa, index) => {
+  trilhaENAM.forEach((casa) => {
     if (idsJaCriados.has(casa.id)) return;
     idsJaCriados.add(casa.id);
 
@@ -220,7 +247,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   atualizarBarraProgresso();
 
-  // Ação do Botão Estatísticas (atribuída de forma segura caso o botão já exista)
   const btnEstatisticas = document.getElementById("btn-estatisticas");
   if (btnEstatisticas) {
     btnEstatisticas.addEventListener("click", () => {
@@ -230,20 +256,19 @@ document.addEventListener("DOMContentLoaded", () => {
       conteudoCasa.innerHTML = `
         <h2 style="color: var(--text-highlight); margin-bottom: 15px;">📊 Estatísticas de Desempenho</h2>
         <p style="margin-bottom: 10px;">Casas Concluídas: <strong>${totalCasasConcluidas} de ${trilhaENAM.length} (${percentual}%)</strong></p>
-        <p style="margin-bottom: 10px;">Questões no Caderno de Erros: <strong>${cadernoErros.length}</strong></p>
-        <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 20px;">Continue firme na sua jornada para o ENAM 2026! A constância é o segredo da aprovação.</p>
+        <p style="margin-bottom: 10px;">Questões Desafiadoras no Caderno de Erros: <strong>${cadernoErros.length}</strong></p>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 20px;">Você está se preparando no padrão de exigência da Magistratura! Foco total nas teses do STF e STJ.</p>
       `;
     });
   }
 
-  // Ação do Botão Caderno de Erros
   const btnErros = document.getElementById("btn-erros");
   if (btnErros) {
     btnErros.addEventListener("click", () => {
       if (cadernoErros.length === 0) {
         conteudoCasa.innerHTML = `
           <h2 style="color: var(--text-highlight); margin-bottom: 15px;">🚨 Caderno de Erros</h2>
-          <p>Parabéns! Você não tem questões pendentes no momento ou ainda não errou nenhuma questão.</p>
+          <p>Excelente! Nenhuma questão pendente de revisão complexa no momento.</p>
         `;
         return;
       }
@@ -255,19 +280,19 @@ document.addEventListener("DOMContentLoaded", () => {
           <div class="alternativas">
             ${item.questao.opcoes.map((opcao, idx) => `
               <div style="padding: 8px; margin: 4px 0; background: var(--bg-secondary); border-radius: 4px; font-size: 0.85rem; ${idx === item.questao.respostaCorreta ? 'border: 1px solid var(--accent-green); color: var(--accent-green);' : ''}">
-                ${opcao} ${idx === item.questao.respostaCorreta ? '<strong>(Gabarito)</strong>' : ''}
+                [${String.fromCharCode(65 + idx)}] ${opcao} ${idx === item.questao.respostaCorreta ? '<strong>(Gabarito Comentado)</strong>' : ''}
               </div>
             `).join("")}
           </div>
           <div style="margin-top: 10px; font-size: 0.85rem; color: var(--text-muted);">
-            <em>Comentário:</em> ${item.questao.comentario}
+            <em>Comentário Estratégico:</em> ${item.questao.comentario}
           </div>
         </div>
       `).join("");
 
       conteudoCasa.innerHTML = `
         <h2 style="color: var(--text-highlight); margin-bottom: 15px;">🚨 Caderno de Erros (${cadernoErros.length})</h2>
-        <p style="margin-bottom: 15px; color: var(--text-muted); font-size: 0.9rem;">Revise com atenção as questões que você errou anteriormente:</p>
+        <p style="margin-bottom: 15px; color: var(--text-muted); font-size: 0.9rem;">Revisão direcionada dos pontos críticos de alta dificuldade:</p>
         ${errosHtml}
       `;
     });
